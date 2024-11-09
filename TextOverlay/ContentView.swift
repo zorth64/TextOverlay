@@ -26,7 +26,7 @@ struct ContentView: View {
     var iconPosition: IconPosition = .left
     var iconColor: ColorModel = ColorModel(.primary)
     var iconRenderingMode: SymbolRenderingMode = .monochrome
-    var backgroundWidth: CGFloat?
+    var overlayWidth: CGFloat?
     var title: String?
     var titleAlign: HorizontalAlignment?
     
@@ -94,9 +94,9 @@ struct ContentView: View {
         
         iconRenderingMode = SymbolRenderingMode.withLabel(UserDefaults.standard.string(forKey: "iconRenderingMode") ?? "")
         
-        let backgroundWidth = UserDefaults.standard.integer(forKey: "backgroundWidth")
-        if (backgroundWidth != 0) {
-            self.backgroundWidth = CGFloat(backgroundWidth)
+        let overlayWidth = UserDefaults.standard.integer(forKey: "overlayWidth")
+        if (overlayWidth != 0) {
+            self.overlayWidth = CGFloat(overlayWidth)
             if (UserDefaults.standard.string(forKey: "textAlign") == nil) {
                 textAlign = .leading
             }
@@ -131,7 +131,7 @@ struct ContentView: View {
                         iconPosition: iconPosition,
                         iconColor: iconColor,
                         iconRenderingMode: iconRenderingMode,
-                        backgroundWidth: backgroundWidth,
+                        overlayWidth: overlayWidth,
                         title: title,
                         titleAlign: titleAlign
         )

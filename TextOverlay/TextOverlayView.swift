@@ -25,12 +25,12 @@ struct TextOverlayView: View {
     var iconPosition: IconPosition
     var iconColor: ColorModel
     var iconRenderingMode: SymbolRenderingMode = .monochrome
-    var backgroundWidth: CGFloat?
+    var overlayWidth: CGFloat?
     var title: String?
     var titleAlign: HorizontalAlignment?
     
     private var isFullWidth: Bool {
-        return backgroundWidth != nil
+        return overlayWidth != nil
     }
     
     @State var showOverlay: Bool = false
@@ -57,7 +57,7 @@ struct TextOverlayView: View {
          iconPosition: IconPosition,
          iconColor: ColorModel,
          iconRenderingMode: SymbolRenderingMode,
-         backgroundWidth: CGFloat?,
+         overlayWidth: CGFloat?,
          title: String?,
          titleAlign: HorizontalAlignment?
     ) {
@@ -77,7 +77,7 @@ struct TextOverlayView: View {
         self.iconPosition = iconPosition
         self.iconColor = iconColor
         self.iconRenderingMode = iconRenderingMode
-        self.backgroundWidth = backgroundWidth
+        self.overlayWidth = overlayWidth
         self.title = title
         self.titleAlign = titleAlign
     }
@@ -132,7 +132,7 @@ struct TextOverlayView: View {
                                         NSApp.terminate(nil)
                                     }
                             } else {
-                                TextWithFullWidthBackgroundView(text: text, textAlign: textAlign, icon: icon, iconPosition: iconPosition, iconColor: iconColor, iconRenderingMode: iconRenderingMode, title: title, titleAlign: titleAlign, backgroundWidth: backgroundWidth)
+                                TextWithFullWidthBackgroundView(text: text, textAlign: textAlign, icon: icon, iconPosition: iconPosition, iconColor: iconColor, iconRenderingMode: iconRenderingMode, title: title, titleAlign: titleAlign, overlayWidth: overlayWidth)
                                     .transition(transition == .scale ?
                                                 transition.getTransition.combined(with: AnyTransition.opacity) :
                                                     AnyTransition.identity)
@@ -333,11 +333,11 @@ private struct TextWithFullWidthBackgroundView: View {
     var iconRenderingMode: SymbolRenderingMode?
     var title: String?
     var titleAlign: HorizontalAlignment?
-    var backgroundWidth: CGFloat?
+    var overlayWidth: CGFloat?
     
     private var textWithSymbolView: AnyView
     
-    init(text: String, textAlign: HorizontalAlignment, icon: String?, iconPosition: IconPosition?, iconColor: ColorModel?, iconRenderingMode: SymbolRenderingMode?, title: String?, titleAlign: HorizontalAlignment?, backgroundWidth: CGFloat?) {
+    init(text: String, textAlign: HorizontalAlignment, icon: String?, iconPosition: IconPosition?, iconColor: ColorModel?, iconRenderingMode: SymbolRenderingMode?, title: String?, titleAlign: HorizontalAlignment?, overlayWidth: CGFloat?) {
         self.text = text
         self.textAlign = textAlign
         self.icon = icon
@@ -346,7 +346,7 @@ private struct TextWithFullWidthBackgroundView: View {
         self.iconRenderingMode = iconRenderingMode
         self.title = title
         self.titleAlign = titleAlign
-        self.backgroundWidth = backgroundWidth
+        self.overlayWidth = overlayWidth
         textWithSymbolView = AnyView(TextWithInlineSymbol(text: self.text))
     }
     
@@ -365,9 +365,9 @@ private struct TextWithFullWidthBackgroundView: View {
         .foregroundColor(.clear)
         .font(.system(size: 25))
         .lineSpacing(6)
-        .modifier(FrameWidthModifier(width: backgroundWidth))
-        .padding(.leading, icon != nil ? iconPosition == .left ? backgroundWidth != nil ? 0 : 65 : backgroundWidth != nil ? 0 : 20 : backgroundWidth != nil ? 2 : 0)
-        .padding(.trailing, icon != nil ? iconPosition == .left ? backgroundWidth != nil ? 0 : 15 : backgroundWidth != nil ? 4 : 65 : backgroundWidth != nil ? 3 : 0)
+        .modifier(FrameWidthModifier(width: overlayWidth))
+        .padding(.leading, icon != nil ? iconPosition == .left ? overlayWidth != nil ? 0 : 65 : overlayWidth != nil ? 0 : 20 : overlayWidth != nil ? 2 : 0)
+        .padding(.trailing, icon != nil ? iconPosition == .left ? overlayWidth != nil ? 0 : 15 : overlayWidth != nil ? 4 : 65 : overlayWidth != nil ? 3 : 0)
         .padding(.top, 9)
         .padding(.bottom, 12)
         .background {
@@ -385,7 +385,7 @@ private struct TextWithFullWidthBackgroundView: View {
                         .aspectRatio(contentMode: .fit)
                         .foregroundStyle(iconColor!.primary, iconColor!.secondary!, iconColor!.tertiary!)
                         .frame(width: 50, height: 50)
-                        .padding(.leading, backgroundWidth != nil ? 0 : 10)
+                        .padding(.leading, overlayWidth != nil ? 0 : 10)
                 }
                 VStack(alignment: title != nil ? titleAlign! : .center, spacing: 5) {
                     if (title != nil) {
@@ -401,8 +401,8 @@ private struct TextWithFullWidthBackgroundView: View {
                     .foregroundColor(.primary)
                     .font(.system(size: 25))
                     .lineSpacing(6)
-                    .padding(.leading, icon != nil ? iconPosition == .left ? backgroundWidth != nil ? 0 : 0 : backgroundWidth != nil ? 0 : 8 : backgroundWidth != nil ? 1 : 0)
-                    .padding(.trailing, icon != nil ? iconPosition == .left ? backgroundWidth != nil ? 0 : 5 : backgroundWidth != nil ? 6 : 7 : backgroundWidth != nil ? 0 : 0)
+                    .padding(.leading, icon != nil ? iconPosition == .left ? overlayWidth != nil ? 0 : 0 : overlayWidth != nil ? 0 : 8 : overlayWidth != nil ? 1 : 0)
+                    .padding(.trailing, icon != nil ? iconPosition == .left ? overlayWidth != nil ? 0 : 5 : overlayWidth != nil ? 6 : 7 : overlayWidth != nil ? 0 : 0)
                     .offset(x: 2, y: -2)
                 if (icon != nil && iconPosition == .right) {
                     Image(systemName: icon!)
@@ -414,7 +414,7 @@ private struct TextWithFullWidthBackgroundView: View {
                         .frame(width: 50, height: 50)
                 }
             }
-                .modifier(FrameWidthModifier(width: backgroundWidth))
+                .modifier(FrameWidthModifier(width: overlayWidth))
                 .shadow(color: colorScheme == .dark ? .black.opacity(0.7) : .white, radius: 5, y: 0)
                 .shadow(color: colorScheme == .dark ? .clear : .white.opacity(0.25), radius: 5, y: 0)
                 ,   alignment: .leading
