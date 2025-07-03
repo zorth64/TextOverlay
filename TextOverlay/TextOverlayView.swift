@@ -25,12 +25,12 @@ struct TextOverlayView: View {
     var iconPosition: IconPosition
     var iconColor: ColorModel
     var iconRenderingMode: SymbolRenderingMode = .monochrome
-    var overlayWidth: CGFloat?
+    var maxWidth: CGFloat?
     var title: String?
     var titleAlign: HorizontalAlignment?
     
     private var isFullWidth: Bool {
-        return overlayWidth != nil
+        return maxWidth != nil
     }
     
     @State var showOverlay: Bool = false
@@ -57,7 +57,7 @@ struct TextOverlayView: View {
          iconPosition: IconPosition,
          iconColor: ColorModel,
          iconRenderingMode: SymbolRenderingMode,
-         overlayWidth: CGFloat?,
+         maxWidth: CGFloat?,
          title: String?,
          titleAlign: HorizontalAlignment?
     ) {
@@ -77,7 +77,7 @@ struct TextOverlayView: View {
         self.iconPosition = iconPosition
         self.iconColor = iconColor
         self.iconRenderingMode = iconRenderingMode
-        self.overlayWidth = overlayWidth
+        self.maxWidth = maxWidth
         self.title = title
         self.titleAlign = titleAlign
     }
@@ -132,7 +132,7 @@ struct TextOverlayView: View {
                                         NSApp.terminate(nil)
                                     }
                             } else {
-                                TextWithFullWidthBackgroundView(text: text, textAlign: textAlign, icon: icon, iconPosition: iconPosition, iconColor: iconColor, iconRenderingMode: iconRenderingMode, title: title, titleAlign: titleAlign, overlayWidth: overlayWidth)
+                                TextWithFullWidthBackgroundView(text: text, textAlign: textAlign, icon: icon, iconPosition: iconPosition, iconColor: iconColor, iconRenderingMode: iconRenderingMode, title: title, titleAlign: titleAlign, maxWidth: maxWidth)
                                     .transition(transition == .scale ?
                                                 transition.getTransition.combined(with: AnyTransition.opacity) :
                                                     AnyTransition.identity)
@@ -232,7 +232,7 @@ private struct TextWithBackgroundView: View {
             VStack(alignment: textAlign, spacing: -32) {
                 if let title = title {
                     TextWithInlineSymbol(text: title)
-                        .foregroundColor(.clear)
+                        .hidden()
                         .font(.system(size: 25, weight: .bold))
                         .padding(.top, 8)
                         .padding(.leading, 10)
@@ -243,7 +243,7 @@ private struct TextWithBackgroundView: View {
                 }
                 ForEach(text.split(separator: "\n"), id: \.self) { line in
                     TextWithInlineSymbol(text: String(line))
-                        .foregroundColor(.clear)
+                        .hidden()
                         .font(.system(size: 25))
                         .padding(.top, 8)
                         .padding(.leading, 10)
@@ -260,7 +260,7 @@ private struct TextWithBackgroundView: View {
                         VStack(alignment: textAlign, spacing: -32) {
                             if let title = title {
                                 TextWithInlineSymbol(text: title)
-                                    .foregroundColor(.primary)
+                                    .hidden()
                                     .font(.system(size: 25, weight: .bold))
                                     .padding(.top, 8)
                                     .padding(.leading, 10)
@@ -272,7 +272,7 @@ private struct TextWithBackgroundView: View {
                             }
                             ForEach(text.split(separator: "\n"), id: \.self) { line in
                                 TextWithInlineSymbol(text: String(line))
-                                    .foregroundColor(.clear)
+                                    .hidden()
                                     .font(.system(size: 25))
                                     .padding(.top, 8)
                                     .padding(.leading, 10)
@@ -287,6 +287,12 @@ private struct TextWithBackgroundView: View {
                     .compositingGroup()
             }
             .compositingGroup()
+            .shadow(color: colorScheme == .dark ? .black : .clear, radius: 0.36)
+            .shadow(color: colorScheme == .dark ? .black : .clear, radius: 0.36)
+            .shadow(color: colorScheme == .dark ? .black : .clear, radius: 0.36)
+            .shadow(color: colorScheme == .dark ? .gray : .clear, radius: 0.35)
+            .shadow(color: colorScheme == .dark ? .gray : .clear, radius: 0.35)
+            .shadow(color: colorScheme == .dark ? .clear : .black.opacity(0.4), radius: 1)
             .shadow(color: .black.opacity(0.3), radius: 15, y: 7)
             VStack(alignment: textAlign, spacing: -32) {
                 if let title = title {
@@ -333,11 +339,11 @@ private struct TextWithFullWidthBackgroundView: View {
     var iconRenderingMode: SymbolRenderingMode?
     var title: String?
     var titleAlign: HorizontalAlignment?
-    var overlayWidth: CGFloat?
+    var maxWidth: CGFloat?
     
     private var textWithSymbolView: AnyView
     
-    init(text: String, textAlign: HorizontalAlignment, icon: String?, iconPosition: IconPosition?, iconColor: ColorModel?, iconRenderingMode: SymbolRenderingMode?, title: String?, titleAlign: HorizontalAlignment?, overlayWidth: CGFloat?) {
+    init(text: String, textAlign: HorizontalAlignment, icon: String?, iconPosition: IconPosition?, iconColor: ColorModel?, iconRenderingMode: SymbolRenderingMode?, title: String?, titleAlign: HorizontalAlignment?, maxWidth: CGFloat?) {
         self.text = text
         self.textAlign = textAlign
         self.icon = icon
@@ -346,7 +352,7 @@ private struct TextWithFullWidthBackgroundView: View {
         self.iconRenderingMode = iconRenderingMode
         self.title = title
         self.titleAlign = titleAlign
-        self.overlayWidth = overlayWidth
+        self.maxWidth = maxWidth
         textWithSymbolView = AnyView(TextWithInlineSymbol(text: self.text))
     }
     
@@ -359,15 +365,16 @@ private struct TextWithFullWidthBackgroundView: View {
                     .truncationMode(.tail)
                     .padding(.bottom, 2)
             }
-            textWithSymbolView
+            TextWithInlineSymbol(text: self.text)
                 .multilineTextAlignment(textAlign.asTextAlignment)
         }
-        .foregroundColor(.clear)
+        .hidden()
+        .offset(x: 5)
         .font(.system(size: 25))
         .lineSpacing(6)
-        .modifier(FrameWidthModifier(width: overlayWidth))
-        .padding(.leading, icon != nil ? iconPosition == .left ? overlayWidth != nil ? 0 : 65 : overlayWidth != nil ? 0 : 20 : overlayWidth != nil ? 2 : 0)
-        .padding(.trailing, icon != nil ? iconPosition == .left ? overlayWidth != nil ? 0 : 15 : overlayWidth != nil ? 4 : 65 : overlayWidth != nil ? 3 : 0)
+        .modifier(FrameMaxWidthModifier(maxWidth: maxWidth))
+        .padding(.leading, icon != nil ? iconPosition == .left ? maxWidth != nil ? 0 : 65 : maxWidth != nil ? 0 : 20 : maxWidth != nil ? 2 : 0)
+        .padding(.trailing, icon != nil ? iconPosition == .left ? maxWidth != nil ? 0 : 15 : maxWidth != nil ? 4 : 65 : maxWidth != nil ? 3 : 0)
         .padding(.top, 9)
         .padding(.bottom, 12)
         .background {
@@ -375,6 +382,12 @@ private struct TextWithFullWidthBackgroundView: View {
                 .overlay(colorScheme == .dark ? .black.opacity(0.5) : .white.opacity(0.55))
         }
         .cornerRadius(10)
+        .shadow(color: colorScheme == .dark ? .black : .clear, radius: 0.36)
+        .shadow(color: colorScheme == .dark ? .black : .clear, radius: 0.36)
+        .shadow(color: colorScheme == .dark ? .black : .clear, radius: 0.36)
+        .shadow(color: colorScheme == .dark ? .gray : .clear, radius: 0.35)
+        .shadow(color: colorScheme == .dark ? .gray : .clear, radius: 0.35)
+        .shadow(color: colorScheme == .dark ? .clear : .black.opacity(0.4), radius: 1)
         .shadow(color: .black.opacity(0.3), radius: 15, y: 7)
         .overlay(
             HStack(alignment: .center) {
@@ -385,7 +398,7 @@ private struct TextWithFullWidthBackgroundView: View {
                         .aspectRatio(contentMode: .fit)
                         .foregroundStyle(iconColor!.primary, iconColor!.secondary!, iconColor!.tertiary!)
                         .frame(width: 50, height: 50)
-                        .padding(.leading, overlayWidth != nil ? 0 : 10)
+                        .padding(.leading, maxWidth != nil ? 0 : 10)
                 }
                 VStack(alignment: title != nil ? titleAlign! : .center, spacing: 5) {
                     if (title != nil) {
@@ -401,8 +414,8 @@ private struct TextWithFullWidthBackgroundView: View {
                     .foregroundColor(.primary)
                     .font(.system(size: 25))
                     .lineSpacing(6)
-                    .padding(.leading, icon != nil ? iconPosition == .left ? overlayWidth != nil ? 0 : 0 : overlayWidth != nil ? 0 : 8 : overlayWidth != nil ? 1 : 0)
-                    .padding(.trailing, icon != nil ? iconPosition == .left ? overlayWidth != nil ? 0 : 5 : overlayWidth != nil ? 6 : 7 : overlayWidth != nil ? 0 : 0)
+                    .padding(.leading, icon != nil ? iconPosition == .left ? maxWidth != nil ? 0 : 0 : maxWidth != nil ? 0 : 8 : maxWidth != nil ? 1 : 0)
+                    .padding(.trailing, icon != nil ? iconPosition == .left ? maxWidth != nil ? 0 : 5 : maxWidth != nil ? 6 : 7 : maxWidth != nil ? 0 : 0)
                     .offset(x: 2, y: -2)
                 if (icon != nil && iconPosition == .right) {
                     Image(systemName: icon!)
@@ -414,7 +427,7 @@ private struct TextWithFullWidthBackgroundView: View {
                         .frame(width: 50, height: 50)
                 }
             }
-                .modifier(FrameWidthModifier(width: overlayWidth))
+                .modifier(FrameMaxWidthModifier(maxWidth: maxWidth))
                 .shadow(color: colorScheme == .dark ? .black.opacity(0.7) : .white, radius: 5, y: 0)
                 .shadow(color: colorScheme == .dark ? .clear : .white.opacity(0.25), radius: 5, y: 0)
                 ,   alignment: .leading
@@ -430,7 +443,52 @@ private struct TextWithInlineSymbol: View {
         parseText(text)
     }
 
-    private func parseText(_ text: String) -> some View {
+    private func parseText(_ text: String) -> Text {
+        var result = Text("")
+
+        let colorRegex = try! NSRegularExpression(pattern: #"<color=([a-zA-Z#0-9]+);(.*?)>"#, options: [.dotMatchesLineSeparators])
+        let fullRange = NSRange(location: 0, length: text.utf16.count)
+
+        var lastRangeEnd = text.startIndex
+
+        let matches = colorRegex.matches(in: text, options: [], range: fullRange)
+
+        for match in matches {
+            guard let colorRange = Range(match.range(at: 1), in: text),
+                  let contentRange = Range(match.range(at: 2), in: text) else { continue }
+
+            let matchStartUTF16 = text.utf16.index(text.utf16.startIndex, offsetBy: match.range.location)
+            let matchStartIndex = String.Index(matchStartUTF16, within: text)!
+            let beforeText = String(text[lastRangeEnd..<matchStartIndex])
+
+            result = result + parseSymbols(beforeText)
+
+            let colorSpec = String(text[colorRange])
+            let innerContent = String(text[contentRange])
+
+            let color = Color(colorName: colorSpec) ?? Color(hex: colorSpec)
+
+            if let color {
+                let coloredText = parseSymbols(innerContent).foregroundColor(color)
+                result = result + coloredText
+            } else {
+                result = result + parseSymbols("<color=\(colorSpec);\(innerContent)>")
+            }
+
+            if let matchRange = Range(match.range, in: text) {
+                lastRangeEnd = matchRange.upperBound
+            }
+        }
+
+        if lastRangeEnd < text.endIndex {
+            let remaining = String(text[lastRangeEnd..<text.endIndex])
+            result = result + parseSymbols(remaining)
+        }
+
+        return result
+    }
+
+    private func parseSymbols(_ text: String) -> Text {
         var result = Text("")
         let regex = try! NSRegularExpression(pattern: "\\[(.*?)\\]", options: [])
 
@@ -438,23 +496,19 @@ private struct TextWithInlineSymbol: View {
         var lastRangeEnd = text.startIndex
 
         for match in matches {
-            let range = match.range(at: 1)
-            let symbolRange = Range(range, in: text)!
-            let matchRange = Range(match.range(at: 0), in: text)!
+            guard let symbolRange = Range(match.range(at: 1), in: text),
+                  let matchRange = Range(match.range(at: 0), in: text) else { continue }
 
             let textBeforeSymbol = String(text[lastRangeEnd..<matchRange.lowerBound])
-            
             result = result + Text(textBeforeSymbol)
 
             let symbolName = String(text[symbolRange])
-            let symbolText = Text(Image(systemName: symbolName))
-
-            result = result + symbolText
+            result = result + Text(Image(systemName: symbolName))
 
             lastRangeEnd = matchRange.upperBound
         }
 
-        if lastRangeEnd < text.index(text.endIndex, offsetBy: -1) {
+        if lastRangeEnd < text.endIndex {
             result = result + Text(String(text[lastRangeEnd..<text.endIndex]))
         }
 
@@ -462,12 +516,12 @@ private struct TextWithInlineSymbol: View {
     }
 }
 
-private struct FrameWidthModifier: ViewModifier {
-    var width: CGFloat?
+private struct FrameMaxWidthModifier: ViewModifier {
+    var maxWidth: CGFloat?
     
     @ViewBuilder func body(content: Content) -> some View {
-        if let width = width {
-            content.frame(maxWidth: width)
+        if let maxWidth = maxWidth {
+            content.frame(maxWidth: maxWidth)
         } else {
             content
         }

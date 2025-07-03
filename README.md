@@ -22,11 +22,23 @@ TextOverlay.app/Contents/MacOS/TextOverlay <TEXT> \
 ## Params
 
 ### `<TEXT>`
-The first parameter is the text of the information to be shown, which may contain one or more lines of text.<br>Supports the insertion of SF Symbols icons along the text by inserting the placeholder with the following format:
+The first parameter is the text of the information to be shown, which may contain one or more lines of text.
+
+#### In-line SF Symbol:
+Supports the insertion of SF Symbols icons along the text by inserting the placeholder with the following format:
 
 `[<SF Symbol name>]`
 
-In the text position where there is an icon placeholder, the marker is automatically replaced by the corresponding symbol between brackets characters.
+The in-line SF Symbol icon marker is automatically replaced by the symbol whose name is defined between the bracket characters.
+
+#### Custom Text Color:
+You can set a color for a specific text snippet with the following syntax:
+
+`<color=<Color name>;<The text to which the color will be applied>>`
+
+Standard macOS system color names are supported, such as `red`, `yellow`, `green` and `accentColor`. It is also possible to define colors using hexadecimal color code.
+
+For example, the text `The quick brown <color=brown;fox> jumps over the lazy dog` applies the brown color to the word “fox”.
 
 ### `-position <vertical>[,<horizontal>]` (default: `center,center`)
 Defines the vertical and horizontal position of the screen where the overlay should be displayed. The values must be separated by comma. The first value indicates the vertical position (options: `top`, `bottom` or `center`), and the second value indicates the horizontal position (options: `left`, `right` or `center`).
@@ -81,8 +93,8 @@ Allows you to define margins that the overlay should have at each end of the scr
 - `-marginLeft` (default: 50)<br>
 - `-marginRight` (default: 50)
 
-### `-overlayWidth`
-By default, the TextOverlay application does not add line breaks to the text that is received by parameter, and the dimensions of the overlay automatically adjust to accommodate the content. This can be a problem when the user has no control over the text that will be displayed. In this case, the `-overlayWidth` parameter serves to add line breaks to the text automatically, and not let the width of the overlay become too large.
+### `-maxWidth`
+By default, the TextOverlay application does not add line breaks to the text that is received by parameter, and the dimensions of the overlay automatically adjust to accommodate the content. This can be a problem when the user has no control over the text that will be displayed. In this case, the `-maxWidth` parameter limits the width of the overlay and adds line breaks to the text automatically when necessary.
 
 ### `-autoDismiss <bool>` (default: `false`)
 The default behavior of the overlay is to remain visible on the screen until the user clicks on it with the mouse to discard it. To discard the overlay automatically after a predefined period of time, use the `-autoDismiss true` parameter.
